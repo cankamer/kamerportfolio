@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-// @ts-expect-error – JSX component, no types needed
 import ProfileCard from "@/components/ui/ProfileCard";
 import GlassSurface from "@/components/ui/GlassSurface";
 
