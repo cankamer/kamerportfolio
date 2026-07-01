@@ -20,7 +20,7 @@ function PhotoCluster({ photos, inView }: { photos: string[]; inView: boolean })
     // shots all fit; each card shrink-wraps to its photo's aspect ratio inside
     // it. Eases in with the card instead of popping.
     <motion.div
-      style={{ width: 340, height: 340 }}
+      className="w-[clamp(160px,24vw,340px)] h-[clamp(160px,24vw,340px)]"
       initial={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
       animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
       transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
@@ -57,19 +57,25 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
   return (
     <li
       ref={ref}
-      className="grid grid-cols-1 items-center gap-6 py-10 sm:grid-cols-[1fr_auto_1fr] sm:min-h-[58vh] sm:gap-8 sm:py-0"
+      className="grid grid-cols-1 items-center gap-6 py-10 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:min-h-[58vh] sm:gap-8 sm:py-0"
     >
       {/* DOM order stays left-card, node, right-card so sm+ grid columns map
           correctly ([1fr_auto_1fr]); `order-*` only reshuffles the mobile
           single-column stack (node above the card) and resets via
-          sm:order-none, where equal-order items fall back to source order. */}
-      <div className="order-2 flex justify-center sm:order-none sm:justify-end">
+          sm:order-none, where equal-order items fall back to source order.
+          The flanking tracks use minmax(0,1fr) — plain 1fr floors at each
+          column's min-content width, so the photo cluster's fixed-ish box
+          could out-bid the card column for space and drag the center
+          (auto) column off true center, desyncing the flower from the
+          SVG line drawn at x=50%. minmax(0,_) keeps both tracks exactly
+          equal regardless of content. */}
+      <div className="order-2 flex min-w-0 justify-center sm:order-none sm:justify-end">
         {side === "left" ? (
           <ProjectCard entry={entry} side="left" inView={inView} />
         ) : (
           // Card is on the right → photos sit on the LEFT, pushed off the path.
           entry.photos?.length ? (
-            <div className="hidden md:block md:mr-20 lg:mr-32">
+            <div className="hidden min-w-0 md:block md:mr-8 lg:mr-20 xl:mr-32">
               <PhotoCluster photos={entry.photos} inView={inView} />
             </div>
           ) : null
@@ -80,13 +86,13 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
         <TimelineNode inView={inView} />
       </div>
 
-      <div className="order-2 flex justify-center sm:order-none sm:justify-start">
+      <div className="order-2 flex min-w-0 justify-center sm:order-none sm:justify-start">
         {side === "right" ? (
           <ProjectCard entry={entry} side="right" inView={inView} />
         ) : (
           // Card is on the left → photos sit on the RIGHT, pushed off the path.
           entry.photos?.length ? (
-            <div className="hidden md:block md:ml-20 lg:ml-32">
+            <div className="hidden min-w-0 md:block md:ml-8 lg:ml-20 xl:ml-32">
               <PhotoCluster photos={entry.photos} inView={inView} />
             </div>
           ) : null
