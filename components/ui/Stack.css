@@ -1,0 +1,62 @@
+.stack-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 600px;
+}
+
+/* Absolute layers fill the bounding box and center the (auto-sized) card so
+   each card can shrink-wrap to its photo's own aspect ratio. */
+.card-rotate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.card-rotate-disabled {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* The card hugs the image: width/height follow the photo, capped by the
+   bounding box, so portrait shots stay portrait and landscape stay landscape. */
+.stack-container .card {
+  border-radius: 1rem;
+  overflow: hidden;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Baroque framing to match the timeline: warm ivory edge + gilt halo. */
+  border: 4px solid rgba(245, 240, 230, 0.92);
+  box-shadow:
+    0 10px 35px -8px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(201, 162, 39, 0.4);
+}
+
+.stack-container .card img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* No crop — the image keeps its native ratio and the card takes its shape. */
+.stack-container .card-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
