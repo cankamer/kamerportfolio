@@ -238,6 +238,18 @@ export default function InteractiveGuitarStrings() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [audio, song]);
 
+  // Re-measure the vine whenever the timeline itself changes size — new cards,
+  // or lazy-loaded photos settling in — so the line's endpoint always tracks
+  // the actual bottom of #journey-path instead of a stale one-time measurement.
+  useEffect(() => {
+    if (!broken) return;
+    const journeyEl = document.getElementById("journey-path");
+    if (!journeyEl) return;
+    const ro = new ResizeObserver(() => computeVine());
+    ro.observe(journeyEl);
+    return () => ro.disconnect();
+  }, [broken, computeVine]);
+
   // Signal broken state + drive the shared scroll progress that covers vine→timeline.
   useEffect(() => {
     stringBroken.set(broken);

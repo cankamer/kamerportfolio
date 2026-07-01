@@ -15,6 +15,48 @@ import type { TimelineEntry } from "@/components/timeline/timeline.types";
  */
 export const TIMELINE: TimelineEntry[] = [
   {
+    id: "staryup-hackathon",
+    // Locale-neutral DD.MM.YYYY — my first-ever hackathon.
+    period: "18.05.2026",
+    category: "ai",
+    title: {
+      tr: "100 StaryUP Hackathon — İlk Hackathonum",
+      en: "100 StaryUP Hackathon — My First Hackathon",
+      de: "100 StaryUP Hackathon — Mein erster Hackathon",
+    },
+    description: {
+      tr: "YTU Startup House ve Türksat Uydu Haberleşme Kablo TV ve İşletme A.Ş. iş birliğiyle, NVIDIA desteğiyle düzenlenen 100 StaryUP Hackathon'una katılarak hayatımın ilk hackathonunu gerçekleştirdim. Ekibimizle 48 saat boyunca yapay zeka tabanlı bir lojistik otomasyon çözümü geliştirdik. Bu süreçte kısıtlı zamanda çalışan bir şey üretmeyi, jüri beklentisine uygun sunum hazırlamayı ve ekip olarak bir ürün çıkarmayı öğrendim.",
+      en: "I took part in the 100 StaryUP Hackathon, organized by YTU Startup House in collaboration with Türksat Satellite Communication Cable TV and Operation Inc. and supported by NVIDIA — my very first hackathon. Over 48 hours, my team and I built an AI-based logistics automation solution. Along the way I learned how to ship something that works under a tight deadline, prepare a pitch that meets the jury's expectations, and deliver a product as a team.",
+      de: "Ich nahm am 100 StaryUP Hackathon teil, veranstaltet vom YTU Startup House in Zusammenarbeit mit der Türksat Satellite Communication Cable TV and Operation Inc. und unterstützt von NVIDIA — mein allererster Hackathon. Innerhalb von 48 Stunden entwickelte mein Team eine KI-basierte Lösung zur Logistikautomatisierung. Dabei lernte ich, unter knapper Zeit etwas Funktionierendes zu bauen, eine Präsentation nach den Erwartungen der Jury vorzubereiten und als Team ein Produkt abzuliefern.",
+    },
+    tags: ["Hackathon", "AI", "Logistics", "NVIDIA", "Teamwork"],
+    href: "https://www.linkedin.com/posts/kamer-can-313412387_hackathon-yapayzeka-startup-ugcPost-7462543283257335810-QRJR/",
+    photos: [
+      "/timeline/staryup-hackathon/1.jpeg",
+      "/timeline/staryup-hackathon/2.jpeg",
+      "/timeline/staryup-hackathon/3.jpeg",
+    ],
+  },
+  {
+    id: "haneko",
+    // Locale-neutral DD.MM.YYYY — the day I joined as CTO.
+    period: "12.03.2026",
+    category: "ai",
+    title: {
+      tr: "Haneko — Kurucu Ortak & CTO",
+      en: "Haneko — Co-Founder & CTO",
+      de: "Haneko — Mitgründer & CTO",
+    },
+    description: {
+      tr: "Haneko'ya CTO olarak katıldım; ekiple birlikte yapay zeka uygulamaları geliştiriyoruz.",
+      en: "Joined Haneko as CTO; together with the team we build artificial-intelligence applications.",
+      de: "Bei Haneko als CTO eingestiegen; gemeinsam mit dem Team entwickeln wir Anwendungen für künstliche Intelligenz.",
+    },
+    tags: ["AI", "Leadership", "Product", "Engineering"],
+    href: "https://www.linkedin.com/company/haneko/",
+    photos: ["/timeline/haneko/1.png"],
+  },
+  {
     id: "teknofest",
     period: "2022 — 2024",
     category: "ai",
@@ -98,12 +140,7 @@ export const TIMELINE: TimelineEntry[] = [
       de: "In der Oberstufe engagierte ich mich in Projekten sozialer Verantwortung — allen voran beim türkischen Verband für Querschnittsgelähmte — und entwickelte empathiegetriebene Lösungen für die Gemeinschaft.",
     },
     tags: ["Volunteering", "Empathy", "Community", "Teamwork"],
-    // Placeholder set from /public/photos — swap for real TOFD shots later.
-    photos: [
-      "/photos/floral-1.png",
-      "/photos/disco-cat.png",
-      "/photos/white-cat.png",
-    ],
+    photos: ["/timeline/tofd/1.png"],
   },
   {
     id: "nft",
@@ -175,19 +212,9 @@ export const TIMELINE: TimelineEntry[] = [
         de: "Charakter-Sprachausgabe",
       },
       {
-        tr: "Çok dilli arayüz",
-        en: "Multilingual interface",
-        de: "Mehrsprachige Oberfläche",
-      },
-      {
         tr: "Boss savaş mekanikleri",
         en: "Boss battle mechanics",
         de: "Bosskampf-Mechaniken",
-      },
-      {
-        tr: "Bulutta tutulan küresel oyuncu sayacı",
-        en: "Cloud-saved global player counter",
-        de: "Cloud-gespeicherter globaler Spielerzähler",
       },
     ],
     // Real comments from the Scratch project, translated faithfully per locale.
@@ -208,23 +235,8 @@ export const TIMELINE: TimelineEntry[] = [
           de: "Mir gefällt die Idee, dass man den Hebel umlegen muss, um durch das Level zu kommen.",
         },
       },
-      {
-        author: "Dim0ha",
-        text: {
-          tr: "GERÇEKTEN ÇOK İYİ BİR PROJE",
-          en: "REALLY THIS A GOOD PROJECT",
-          de: "WIRKLICH, DAS IST EIN GUTES PROJEKT",
-        },
-      },
     ],
-    // Placeholders — drop real screenshots into public/timeline/little-crusoe/
-    // and swap these for "/timeline/little-crusoe/1.png", etc. See that folder's
-    // README for the convention.
-    photos: [
-      "/photos/disco-cat.png",
-      "/photos/floral-1.png",
-      "/photos/white-cat.png",
-    ],
+    photos: ["/timeline/little-crusoe/1.png"],
   },
   {
     // The very first build of the journey — a mid-term-break Arduino project.
