@@ -57,9 +57,13 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
   return (
     <li
       ref={ref}
-      className="grid min-h-[58vh] grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-8"
+      className="grid grid-cols-1 items-center gap-6 py-10 sm:grid-cols-[1fr_auto_1fr] sm:min-h-[58vh] sm:gap-8 sm:py-0"
     >
-      <div className="flex justify-end">
+      {/* DOM order stays left-card, node, right-card so sm+ grid columns map
+          correctly ([1fr_auto_1fr]); `order-*` only reshuffles the mobile
+          single-column stack (node above the card) and resets via
+          sm:order-none, where equal-order items fall back to source order. */}
+      <div className="order-2 flex justify-center sm:order-none sm:justify-end">
         {side === "left" ? (
           <ProjectCard entry={entry} side="left" inView={inView} />
         ) : (
@@ -72,9 +76,11 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
         )}
       </div>
 
-      <TimelineNode inView={inView} />
+      <div className="order-1 justify-self-center sm:order-none sm:justify-self-auto">
+        <TimelineNode inView={inView} />
+      </div>
 
-      <div className="flex justify-start">
+      <div className="order-2 flex justify-center sm:order-none sm:justify-start">
         {side === "right" ? (
           <ProjectCard entry={entry} side="right" inView={inView} />
         ) : (

@@ -82,7 +82,8 @@ export default function ProjectCard({
         "hover:border-gold/40",
         "before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px",
         "before:bg-gradient-to-r before:from-transparent before:via-gold/70 before:to-transparent",
-        side === "left" ? "text-right" : "text-left"
+        "text-left",
+        side === "left" && "sm:text-right"
       )}
     >
       {/* Optional lazy media — only mounts once the card is in view. */}
@@ -111,8 +112,9 @@ export default function ProjectCard({
 
       <div
         className={cn(
-          "flex items-center gap-3",
-          side === "left" ? "justify-end" : "justify-start"
+          "flex flex-wrap items-center gap-3",
+          "justify-start",
+          side === "left" && "sm:justify-end"
         )}
       >
         <span className="font-sans text-xs uppercase tracking-[0.25em] text-gold-dim">
@@ -133,7 +135,8 @@ export default function ProjectCard({
       <ul
         className={cn(
           "mt-4 flex flex-wrap gap-2",
-          side === "left" ? "justify-end" : "justify-start"
+          "justify-start",
+          side === "left" && "sm:justify-end"
         )}
       >
         {entry.tags.map((tag) => (
@@ -150,7 +153,8 @@ export default function ProjectCard({
         <dl
           className={cn(
             "mt-5 flex flex-wrap gap-x-6 gap-y-3",
-            side === "left" ? "justify-end" : "justify-start"
+            "justify-start",
+            side === "left" && "sm:justify-end"
           )}
         >
           {entry.stats.map((stat) => (
@@ -175,7 +179,8 @@ export default function ProjectCard({
                 key={pick(feature, locale)}
                 className={cn(
                   "flex items-start gap-2 font-sans text-sm text-ivory-dim",
-                  side === "left" ? "flex-row-reverse text-right" : "text-left"
+                  "text-left",
+                  side === "left" && "sm:flex-row-reverse sm:text-right"
                 )}
               >
                 <span aria-hidden className={cn("mt-0.5 shrink-0", accent)}>

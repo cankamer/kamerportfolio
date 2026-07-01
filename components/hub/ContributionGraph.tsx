@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
@@ -71,6 +71,20 @@ function fallbackDays(): Day[] {
  *
  * Live data comes from the public, auth-free jogruber contributions API.
  */
+/** Horizontally scrollable calendar strip; snaps to the newest (rightmost) week on mount/resize. */
+function CalendarScroller({ children }: { children: ReactNode }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [children]);
+  return (
+    <div ref={scrollRef} className="overflow-x-auto pb-1 [scrollbar-width:none]">
+      {children}
+    </div>
+  );
+}
+
 export default function ContributionGraph({
   label,
   href,
@@ -185,21 +199,24 @@ export default function ContributionGraph({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.4 }}
-              className="flex justify-center gap-[3px] overflow-hidden"
             >
-              {grid.map((week, w) => (
-                <div key={w} className="flex flex-col gap-[3px]">
-                  {week.map((level, dd) => (
-                    <span
-                      key={dd}
-                      className="h-2.5 w-2.5 rounded-[2px]"
-                      style={{
-                        backgroundColor: level < 0 ? "transparent" : RAMP[level],
-                      }}
-                    />
+              <CalendarScroller>
+                <div className="flex justify-center gap-[3px]">
+                  {grid.map((week, w) => (
+                    <div key={w} className="flex flex-col gap-[3px]">
+                      {week.map((level, dd) => (
+                        <span
+                          key={dd}
+                          className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                          style={{
+                            backgroundColor: level < 0 ? "transparent" : RAMP[level],
+                          }}
+                        />
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
+              </CalendarScroller>
             </motion.div>
           )}
         </AnimatePresence>
