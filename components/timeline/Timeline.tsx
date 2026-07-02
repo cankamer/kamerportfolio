@@ -1,29 +1,40 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { useRef, useState } from "react";
 import { TIMELINE } from "@/lib/data/timeline";
 import SectionHeading from "@/components/ui/SectionHeading";
 import TimelineNode from "./TimelineNode";
 import ProjectCard from "./ProjectCard";
 import Stack from "@/components/ui/Stack";
-import { useInView } from "@/hooks/useInView";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 import type { TimelineEntry } from "./timeline.types";
 
 /** Draggable photo stack shown on the side opposite the card. Each card takes
  *  the shape of its own photo (see Stack.css); this is just the bounding box. */
-function PhotoCluster({ photos, inView }: { photos: string[]; inView: boolean }) {
-  if (!inView) return null;
+function PhotoCluster({
+  photos,
+  mounted,
+  progress,
+}: {
+  photos: string[];
+  mounted: boolean;
+  /** 0→1, tied directly to the row's scroll position — never a discrete pop. */
+  progress: MotionValue<number>;
+}) {
+  const opacity = useTransform(progress, [0, 1], [0, 1]);
+  const scale = useTransform(progress, [0, 1], [0.85, 1]);
+  const filter = useTransform(progress, [0, 1], ["blur(8px)", "blur(0px)"]);
+
+  if (!mounted) return null;
   return (
     // Square-ish bounding box (340 × 340) so portrait, landscape and square
     // shots all fit; each card shrink-wraps to its photo's aspect ratio inside
-    // it. Eases in with the card instead of popping.
+    // it. Tracks scroll position directly so it can never "pop" ahead of it.
     <motion.div
       className="w-[clamp(160px,24vw,340px)] h-[clamp(160px,24vw,340px)]"
-      initial={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      style={{ opacity, scale, filter }}
     >
       <Stack
         randomRotation
@@ -42,21 +53,29 @@ function PhotoCluster({ photos, inView }: { photos: string[]; inView: boolean })
 }
 
 /**
- * One timeline row. A single IntersectionObserver on the row drives both the
- * blooming node and the card, so the card fades in exactly as the flower opens.
+ * One timeline row. Reveal is tied directly to the row's scroll position
+ * (not a discrete IntersectionObserver flip), so the card/flower/photos
+ * always match exactly how far the user has scrolled — they can never
+ * "pop in" ahead of or behind a fast scroll.
  */
 function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "right" }) {
-  // once:false → blooms replay each time the row re-enters the viewport.
-  // The negative bottom margin delays the reveal until the row climbs higher.
-  const { ref, inView } = useInView<HTMLLIElement>({
-    threshold: 0.2,
-    rootMargin: "0px 0px -35% 0px",
-    once: false,
+  const rowRef = useRef<HTMLLIElement>(null);
+  // start 90%: begins revealing just before the row enters the viewport.
+  // start 40%: fully revealed once it's climbed most of the way up — mirrors
+  // the old rootMargin -35% delay, but continuously instead of as a jump.
+  const { scrollYProgress } = useScroll({
+    target: rowRef,
+    offset: ["start 90%", "start 40%"],
   });
+
+  // Cheap boolean, only for mount/unmount of heavy content (lazy media,
+  // draggable photo stack) — never drives the actual animation.
+  const [mounted, setMounted] = useState(false);
+  useMotionValueEvent(scrollYProgress, "change", (v) => setMounted(v > 0));
 
   return (
     <li
-      ref={ref}
+      ref={rowRef}
       className="grid grid-cols-1 items-center gap-6 py-10 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:min-h-[58vh] sm:gap-8 sm:py-0"
     >
       {/* DOM order stays left-card, node, right-card so sm+ grid columns map
@@ -71,29 +90,29 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
           equal regardless of content. */}
       <div className="order-2 flex min-w-0 justify-center sm:order-none sm:justify-end">
         {side === "left" ? (
-          <ProjectCard entry={entry} side="left" inView={inView} />
+          <ProjectCard entry={entry} side="left" progress={scrollYProgress} mounted={mounted} />
         ) : (
           // Card is on the right → photos sit on the LEFT, pushed off the path.
           entry.photos?.length ? (
             <div className="hidden min-w-0 md:block md:mr-8 lg:mr-20 xl:mr-32">
-              <PhotoCluster photos={entry.photos} inView={inView} />
+              <PhotoCluster photos={entry.photos} mounted={mounted} progress={scrollYProgress} />
             </div>
           ) : null
         )}
       </div>
 
       <div className="order-1 justify-self-center sm:order-none sm:justify-self-auto">
-        <TimelineNode inView={inView} />
+        <TimelineNode inView={mounted} />
       </div>
 
       <div className="order-2 flex min-w-0 justify-center sm:order-none sm:justify-start">
         {side === "right" ? (
-          <ProjectCard entry={entry} side="right" inView={inView} />
+          <ProjectCard entry={entry} side="right" progress={scrollYProgress} mounted={mounted} />
         ) : (
           // Card is on the left → photos sit on the RIGHT, pushed off the path.
           entry.photos?.length ? (
             <div className="hidden min-w-0 md:block md:ml-8 lg:ml-20 xl:ml-32">
-              <PhotoCluster photos={entry.photos} inView={inView} />
+              <PhotoCluster photos={entry.photos} mounted={mounted} progress={scrollYProgress} />
             </div>
           ) : null
         )}

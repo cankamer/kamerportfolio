@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValueEvent, useTransform, type MotionValue } from "framer-motion";
+import { motion, useMotionValueEvent, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useState } from "react";
 import { stringBroken, sharedPathProgress, sharedVineRatio } from "@/lib/sharedPath";
 
@@ -45,11 +45,15 @@ export default function WindingLine({
 
   // When vine is broken, use the [vineRatio → 1] slice of sharedPathProgress.
   // Otherwise fall back to Timeline's own scrollYProgress.
-  const effectiveProgress = useTransform(
+  const rawProgress = useTransform(
     [sharedPathProgress, sharedVineRatio, scrollYProgress],
     ([p, r, local]: number[]) =>
       r > 0 ? Math.max(0, Math.min(1, (p - r) / (1 - r))) : local
   );
+
+  // Smooth out sudden jumps (e.g. from lazy-loaded photos shifting layout
+  // mid-scroll and reshuffling the progress range) instead of teleporting.
+  const effectiveProgress = useSpring(rawProgress, { stiffness: 300, damping: 40, mass: 0.5 });
 
   const headLength = useTransform(effectiveProgress, [0, 1], [0.0, 0.04]);
 

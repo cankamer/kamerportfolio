@@ -22,14 +22,7 @@ export default function Hero() {
 
       <HeroCanvas />
 
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.1 }}
-        className="font-sans text-xs uppercase tracking-[0.4em] text-gold-dim"
-      >
-        {d.hero.eyebrow}
-      </motion.p>
+
 
       <motion.h1
         initial={{ opacity: 0, y: 20, filter: "blur(12px)" }}

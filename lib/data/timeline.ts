@@ -66,9 +66,9 @@ export const TIMELINE: TimelineEntry[] = [
       de: "Teknofest Künstliche Intelligenz — Teamkapitän & Mitglied",
     },
     description: {
-      tr: "Teknofest'in yapay zeka kategorilerinde hem takım kaptanı hem üye olarak yarıştım. Model geliştirme ve sunumların yanında liderlik ve takım çalışması becerilerimi sahada geliştirdim.",
-      en: "Competed in Teknofest's AI categories as both team captain and member. Alongside model development and presentations, I sharpened leadership and teamwork in the field.",
-      de: "In den KI-Kategorien von Teknofest als Teamkapitän und Mitglied angetreten. Neben Modellentwicklung und Präsentationen schärfte ich Führung und Teamarbeit in der Praxis.",
+      tr: "Teknofest'in yapay zeka kategorilerinde hem takım kaptanı hem üye olarak yarıştım. Abdominal bölgede yapay zeka ile kanser tespiti yapan bir projede görev aldım. Model geliştirme ve sunumların yanında liderlik ve takım çalışması becerilerimi sahada geliştirdim.",
+      en: "Competed in Teknofest's AI categories as both team captain and member. Took part in a project focused on AI-based cancer detection in the abdominal region. Alongside model development and presentations, I sharpened leadership and teamwork in the field.",
+      de: "In den KI-Kategorien von Teknofest als Teamkapitän und Mitglied angetreten. Wirkte an einem Projekt zur KI-basierten Krebserkennung im Bauchraum mit. Neben Modellentwicklung und Präsentationen schärfte ich Führung und Teamarbeit in der Praxis.",
     },
     tags: ["Python", "Machine Learning", "Computer Vision", "Leadership"],
     // Placeholder set from /public/photos — swap for real Teknofest shots later.
@@ -81,7 +81,7 @@ export const TIMELINE: TimelineEntry[] = [
   },
   {
     id: "smarthome",
-    period: "2023",
+    period: "2020",
     category: "electronics",
     title: {
       tr: "Arduino Tabanlı Akıllı Ev Sistemi",
@@ -89,9 +89,9 @@ export const TIMELINE: TimelineEntry[] = [
       de: "Arduino-basiertes Smart-Home-System",
     },
     description: {
-      tr: "Öğrendiğim yazılım ve donanım bilgilerini birleştirerek sensörlerle çevreyi algılayan, otomasyon kuran Arduino tabanlı bir akıllı ev sistemi tasarlayıp gerçekledim.",
-      en: "Merging my software and hardware knowledge, I designed and built an Arduino-based smart-home system that senses its environment and automates the home.",
-      de: "Durch die Verbindung von Software und Hardware entwarf und baute ich ein Arduino-basiertes Smart-Home-System, das seine Umgebung erfasst und das Zuhause automatisiert.",
+      tr: "Ürünün tüm tasarımını ve üretim sürecini baştan sona tek başıma gerçekleştirdim. Telefondan kontrol edilen, perde ve oda ışığını yöneten Arduino tabanlı bir akıllı ev sistemi tasarlayıp ürettim.",
+      en: "I handled the entire product design and manufacturing process solo, from start to finish. I designed and built an Arduino-based smart-home system that controls curtains and room lighting via phone.",
+      de: "Ich habe das gesamte Produktdesign und den Fertigungsprozess allein von Anfang bis Ende durchgeführt. Ich entwarf und baute ein Arduino-basiertes Smart-Home-System, das Vorhänge und Raumbeleuchtung per Telefon steuert.",
     },
     tags: ["Arduino", "C++", "Sensors", "IoT", "Automation"],
     // Placeholder set from /public/photos — swap for real smart-home shots later.
@@ -112,17 +112,15 @@ export const TIMELINE: TimelineEntry[] = [
       de: "Deneyap-Werkstätten — Robotik & Wettbewerbe",
     },
     description: {
-      tr: "Deneyap Atölyeleri'nde aldığım eğitimle robot yarışmalarında ve proje sunumlarında yer aldım; tasarımdan prototiplemeye uçtan uca üretim deneyimi kazandım.",
-      en: "With the training from the Deneyap Workshops I took part in robotics competitions and project presentations, gaining end-to-end experience from design to prototyping.",
-      de: "Mit der Ausbildung der Deneyap-Werkstätten nahm ich an Roboterwettbewerben und Projektpräsentationen teil und sammelte durchgängige Erfahrung von Entwurf bis Prototyping.",
+      tr: "Deneyap Atölyeleri'nde aldığım eğitimle robot yarışmalarında ve proje sunumlarında yer aldım; tasarımdan prototiplemeye uçtan uca üretim deneyimi kazandım. Nesnelerin İnterneti (IoT), API kullanımı ve C dili gibi temel dersleri aldım.",
+      en: "With the training from the Deneyap Workshops I took part in robotics competitions and project presentations, gaining end-to-end experience from design to prototyping. I took foundational courses on the Internet of Things (IoT), API usage, and the C language.",
+      de: "Mit der Ausbildung der Deneyap-Werkstätten nahm ich an Roboterwettbewerben und Projektpräsentationen teil und sammelte durchgängige Erfahrung von Entwurf bis Prototyping. Ich belegte Grundlagenkurse zu Internet der Dinge (IoT), API-Nutzung und der Programmiersprache C.",
     },
-    tags: ["Robotics", "Embedded", "Prototyping", "Presentations"],
-    // Placeholder set from /public/photos — swap for real Deneyap shots later.
+    tags: ["Robotics", "Embedded", "Prototyping", "Presentations", "IoT", "C", "API"],
     photos: [
-      "/photos/white-cat.png",
-      "/photos/floral-1.png",
-      "/photos/disco-cat.png",
-      "/photos/floral-2.png",
+      "/timeline/deneyap/1.png",
+      "/timeline/deneyap/2.png",
+      "/timeline/deneyap/3.png",
     ],
   },
   {

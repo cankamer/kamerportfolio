@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type MouseEvent } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { pick } from "@/lib/i18n/config";
 import { CATEGORY_ACCENT, type TimelineEntry } from "./timeline.types";
@@ -14,23 +14,30 @@ const ROTATE_AMPLITUDE = 9;
 const SCALE_ON_HOVER = 1.03;
 
 /**
- * A single journey card. Slides + unblurs in from its side when scrolled into
- * view (IntersectionObserver-gated so off-screen cards never animate, and any
- * media only loads once visible). All copy comes from the active locale.
+ * A single journey card. Slides + unblurs in from its side, tracking the
+ * row's scroll position directly (not a discrete IntersectionObserver flip)
+ * so it can never "pop in" ahead of or behind a fast scroll. `mounted` only
+ * gates lazy media, not the animation itself.
  */
 export default function ProjectCard({
   entry,
   side,
-  inView,
+  progress,
+  mounted,
 }: {
   entry: TimelineEntry;
   side: "left" | "right";
-  /** Shared with the row's TimelineNode so card + flower reveal together. */
-  inView: boolean;
+  /** 0→1, tied directly to the row's scroll position. */
+  progress: MotionValue<number>;
+  mounted: boolean;
 }) {
   const { locale, d } = useLocale();
   const accent = CATEGORY_ACCENT[entry.category];
   const fromX = side === "left" ? -60 : 60;
+
+  const opacity = useTransform(progress, [0, 1], [0, 1]);
+  const x = useTransform(progress, [0, 1], [fromX, 0]);
+  const filter = useTransform(progress, [0, 1], ["blur(10px)", "blur(0px)"]);
 
   // --- 3D tilt (TiltedCard mechanics) ---------------------------------------
   const tiltRef = useRef<HTMLDivElement>(null);
@@ -67,14 +74,7 @@ export default function ProjectCard({
     >
     <motion.article
       ref={tiltRef}
-      initial={{ opacity: 0, x: fromX, filter: "blur(10px)" }}
-      animate={
-        inView
-          ? { opacity: 1, x: 0, filter: "blur(0px)" }
-          : { opacity: 0, x: fromX, filter: "blur(10px)" }
-      }
-      transition={{ duration: 0.75, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-      style={{ rotateX, rotateY, scale, transformStyle: "preserve-3d" }}
+      style={{ opacity, x, filter, rotateX, rotateY, scale, transformStyle: "preserve-3d" }}
       className={cn(
         "group relative w-full overflow-hidden rounded-2xl",
         "border border-gold/15 bg-marble/50 p-6 backdrop-blur-md",
@@ -87,7 +87,7 @@ export default function ProjectCard({
       )}
     >
       {/* Optional lazy media — only mounts once the card is in view. */}
-      {entry.media && inView && (
+      {entry.media && mounted && (
         <div className="mb-4 overflow-hidden rounded-xl border border-gold/10">
           {entry.media.type === "image" ? (
             // eslint-disable-next-line @next/next/no-img-element

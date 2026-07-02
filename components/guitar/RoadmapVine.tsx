@@ -2,6 +2,7 @@
 
 import {
   motion,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import { WINDING_AMPLITUDE_RATIO } from "./buildPaths";
@@ -34,10 +35,14 @@ export default function RoadmapVine({
   crossingYs,
 }: RoadmapVineProps) {
   // Scroll progress: shared 0→1 (vineRatio=1 so this equals sharedPathProgress)
-  const scrollYProgress = useTransform(
+  const rawScrollYProgress = useTransform(
     [sharedPathProgress, sharedVineRatio],
     ([p, r]: number[]) => r > 0 ? Math.max(0, Math.min(1, p / r)) : 0
   );
+
+  // Smooth out sudden jumps (e.g. from lazy-loaded photos shifting layout
+  // mid-scroll and reshuffling the progress range) instead of teleporting.
+  const scrollYProgress = useSpring(rawScrollYProgress, { stiffness: 300, damping: 40, mass: 0.5 });
 
   const seg = Math.max(1, Math.round(segments));
   const axis = widthPx / 2;
