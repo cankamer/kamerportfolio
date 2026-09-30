@@ -9,6 +9,7 @@ import SakuraCursor from "@/components/SakuraCursor";
 import SideNav from "@/components/SideNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ScrollToTopOnLoad from "@/components/ScrollToTopOnLoad";
+import SmoothScroll from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
   title: "Kamer Can — Creative Technologist",
@@ -37,6 +38,7 @@ export default async function RootLayout({
       <body className="relative min-h-full overflow-x-hidden" suppressHydrationWarning>
         <LocaleProvider initialLocale={locale}>
           <ScrollToTopOnLoad />
+          <SmoothScroll />
           <FloralBackground />
           <SakuraCursor />
 

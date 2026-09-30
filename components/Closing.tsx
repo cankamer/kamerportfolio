@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { smoothScrollTo } from "@/components/SmoothScroll";
 
 /**
  * Final full-height section — a quiet baroque coda that also gives the page
@@ -41,7 +42,7 @@ export default function Closing() {
 
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => smoothScrollTo(0)}
           className="mt-10 cursor-pointer font-sans text-[11px] uppercase tracking-[0.3em] text-gold-dim transition-colors hover:text-gold"
         >
           ↑ <span className="ml-1">{d.footer.backToTop}</span>

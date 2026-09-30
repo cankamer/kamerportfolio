@@ -3,23 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Hero from "@/components/hero/Hero";
+import GrandDoors from "@/components/intro/GrandDoors";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { stringBroken } from "@/lib/sharedPath";
 
 /* =========================================================================
    INTRO STAGE
-   The first page (Hero) and the scroll-bound door video share ONE screen.
+   The first page (Hero) and the scroll-bound doors share ONE screen.
 
    • The Hero is pinned (sticky) as the BACKGROUND.
-   • The door video — encoded with a real alpha channel (VP9/WebM), so the
-     chroma-keyed-out areas are genuinely transparent — sits on TOP. Through the
-     opening doors / keyholes you see the pinned Hero behind.
-   • Scrolling scrubs the clip: the doors swing open as you scroll. By the last
-     frame the doors are fully gone (fully transparent) → the Hero stands alone.
+   • The doors (GrandDoors, drawn in CSS/SVG) sit on TOP and swing open as you
+     scroll, revealing the pinned Hero behind.
    • Once the stage's scroll budget is spent the sticky releases and the Hero
      scrolls away normally into the timeline.
-
-   The webm is encoded all-keyframe so seeking to any currentTime is instant.
    ========================================================================= */
 
 // Total stage height. The first 100vh is the visible screen; the rest is the
@@ -35,8 +31,6 @@ const VIDEO_SCRUB_END = 0.6;
 export default function IntroStage() {
   const { d } = useLocale();
   const stageRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [duration, setDuration] = useState(0);
 
   // 0 when the stage top hits the viewport top; 1 once the scroll budget is
   // spent (sticky about to release).
@@ -57,54 +51,9 @@ export default function IntroStage() {
     return scrollYProgress.on("change", (v) => setRevealed(v >= VIDEO_SCRUB_END));
   }, [scrollYProgress]);
 
-  // Prime the decoder: a paused video that has never played won't repaint on a
-  // currentTime seek in many browsers. A muted play()→pause() warms it up.
-  function prime(video: HTMLVideoElement) {
-    const p = video.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
-        video.pause();
-        video.currentTime = 0;
-      }).catch(() => {
-        /* autoplay blocked — seeks still usually paint once data is ready */
-      });
-    }
-  }
-
-  // Drive video.currentTime from scroll, smoothed with a per-frame lerp.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let raf = 0;
-    let current = video.currentTime;
-
-    const tick = () => {
-      const dur = duration || video.duration || 0;
-      if (dur && video.readyState >= 2) {
-        // Map only the first VIDEO_SCRUB_END of the pinned scroll to the clip;
-        // past that the doors are fully open and the video holds its last frame.
-        const p = Math.min(scrollYProgress.get() / VIDEO_SCRUB_END, 1);
-        const target = p * dur;
-        current += (target - current) * 0.18;
-        if (Math.abs(target - current) < 0.001) current = target;
-        if (!video.seeking) {
-          try {
-            video.currentTime = current;
-          } catch {
-            /* not seekable yet — ignore */
-          }
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [duration, scrollYProgress]);
-
   return (
     <section ref={stageRef} className="relative" style={{ height: `${STAGE_VH}vh` }}>
-      {/* Pinned screen: Hero behind, transparent door video in front. */}
+      {/* Pinned screen: Hero behind, doors in front. */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Background — the actual first page */}
         <Hero />
@@ -116,18 +65,8 @@ export default function IntroStage() {
           <div aria-hidden className="absolute inset-0 z-20" />
         )}
 
-        {/* Foreground — alpha door video; transparent areas reveal the Hero.
-            pointer-events-none so it never blocks the page once revealed. */}
-        <video
-          ref={videoRef}
-          className="pointer-events-none absolute inset-0 z-30 h-full w-full object-cover"
-          src="/kamerportfolio.webm"
-          muted
-          playsInline
-          preload="auto"
-          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-          onLoadedData={(e) => prime(e.currentTarget)}
-        />
+        {/* Foreground — code-drawn doors that swing open with scroll. */}
+        <GrandDoors progress={scrollYProgress} scrubEnd={VIDEO_SCRUB_END} />
 
         {/* Rose petals — fall from cursor while scrolling, stop once doors open */}
         <RosePetalCanvas scrollYProgress={scrollYProgress} />
