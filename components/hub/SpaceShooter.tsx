@@ -18,7 +18,8 @@ const TOUGH_LEVEL = 3;
 
 /**
  * GitHub Space Shooter — the contribution squares lift off as a fleet of green
- * invaders. Move with ← → (or A/D / mouse), fire with Space / click. Busy days
+ * invaders. Move with ← → (or A/D / mouse / finger drag), fire with Space /
+ * click / holding a finger down. Busy days
  * (high contribution count) take two hits. Clear them all to win.
  */
 export default function SpaceShooter({
@@ -100,9 +101,15 @@ export default function SpaceShooter({
     const ku = (e: KeyboardEvent) => {
       keys[e.key] = false;
     };
-    const onMove = (e: MouseEvent) => {
+    // Pointer events cover mouse and touch alike. On touch, dragging moves the
+    // ship and keeping a finger down auto-fires.
+    let firing = false;
+    const moveTo = (clientX: number) => {
       const r = canvas.getBoundingClientRect();
-      player.x = Math.min(W - player.halfW, Math.max(player.halfW, e.clientX - r.left));
+      player.x = Math.min(W - player.halfW, Math.max(player.halfW, clientX - r.left));
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" || firing) moveTo(e.clientX);
     };
     const shoot = () => {
       const now = performance.now();
@@ -110,11 +117,22 @@ export default function SpaceShooter({
       lastShot = now;
       bullets.push({ x: player.x, y: player.y - 20 });
     };
+    const onDown = (e: PointerEvent) => {
+      moveTo(e.clientX);
+      shoot();
+      if (e.pointerType !== "mouse") firing = true;
+    };
+    const onUp = () => {
+      firing = false;
+    };
     canvas.addEventListener("keydown", kd);
     canvas.addEventListener("keyup", ku);
-    canvas.addEventListener("mousemove", onMove);
-    canvas.addEventListener("mousedown", shoot);
-    canvas.focus();
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerdown", onDown);
+    canvas.addEventListener("pointerup", onUp);
+    canvas.addEventListener("pointercancel", onUp);
+    canvas.addEventListener("pointerleave", onUp);
+    canvas.focus({ preventScroll: true });
 
     const drawShip = (px: number, py: number) => {
       ctx.save();
@@ -165,7 +183,7 @@ export default function SpaceShooter({
         if (keys["ArrowLeft"] || keys["a"]) player.x -= player.speed;
         if (keys["ArrowRight"] || keys["d"]) player.x += player.speed;
         player.x = Math.min(W - player.halfW, Math.max(player.halfW, player.x));
-        if (keys[" "] || keys["ArrowUp"]) shoot();
+        if (keys[" "] || keys["ArrowUp"] || firing) shoot();
 
         driftX += dir * 0.22;
         if (driftX > 16 || driftX < -16) {
@@ -246,8 +264,11 @@ export default function SpaceShooter({
       cancelAnimationFrame(raf);
       canvas.removeEventListener("keydown", kd);
       canvas.removeEventListener("keyup", ku);
-      canvas.removeEventListener("mousemove", onMove);
-      canvas.removeEventListener("mousedown", shoot);
+      canvas.removeEventListener("pointermove", onMove);
+      canvas.removeEventListener("pointerdown", onDown);
+      canvas.removeEventListener("pointerup", onUp);
+      canvas.removeEventListener("pointercancel", onUp);
+      canvas.removeEventListener("pointerleave", onUp);
       window.removeEventListener("resize", onResize);
     };
   }, [invaders, cols, resetKey]);
@@ -259,7 +280,8 @@ export default function SpaceShooter({
         tabIndex={0}
         aria-label="GitHub Space Shooter"
         className="w-full cursor-crosshair rounded-md outline-none"
-        style={{ height: PLAY_H }}
+        // Vertical swipes still scroll the page; horizontal drags steer the ship.
+        style={{ height: PLAY_H, touchAction: "pan-y" }}
       />
 
       {(cleared || lost) && (

@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import SpaceShooter, { type Invader } from "./SpaceShooter";
+
+const COARSE = "(pointer: coarse)";
+const subscribeCoarse = (cb: () => void) => {
+  const m = window.matchMedia(COARSE);
+  m.addEventListener("change", cb);
+  return () => m.removeEventListener("change", cb);
+};
+const isCoarse = () => window.matchMedia(COARSE).matches;
 
 /** GitHub green ramp (level 0 = empty, 1–4 = intensity). */
 const GREEN = ["rgba(110,118,129,0.16)", "#0e4429", "#006d32", "#26a641", "#39d353"];
@@ -100,6 +108,8 @@ export default function ContributionGraph({
   const ref = useRef<HTMLDivElement>(null);
   const [days, setDays] = useState<Day[] | null>(null);
   const [playing, setPlaying] = useState(false);
+  // Touch devices get touch-control hints instead of keyboard ones.
+  const touch = useSyncExternalStore(subscribeCoarse, isCoarse, () => false);
 
   const RAMP = variant === "gitlab" ? ORANGE : GREEN;
 
@@ -173,7 +183,9 @@ export default function ContributionGraph({
         )}
         <span className="font-sans text-[11px] text-ivory-dim">
           {playing
-            ? d.game.controls
+            ? touch
+              ? d.game.controlsTouch
+              : d.game.controls
             : days
               ? `${total.toLocaleString()} ${d.hub.contributions} · ${d.hub.placeholderNote}`
               : "…"}

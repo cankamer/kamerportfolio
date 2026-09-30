@@ -44,6 +44,15 @@ html {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+/* Nothing may widen the page sideways (cards slide in from the sides, the
+   doors carry wide rose layers). Mobile browsers ignore body overflow-x:hidden
+   when sizing the layout viewport and zoom the whole page out; `clip` stops
+   that without creating a scroll container, so position:sticky still works. */
+html,
+body {
+  overflow-x: clip;
+}
 /* Hide the scrollbar in WebKit/Blink (Chrome, Edge, Safari). */
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {

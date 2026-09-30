@@ -9,7 +9,6 @@ import ProjectCard from "./ProjectCard";
 import Stack from "@/components/ui/Stack";
 import LogoOrigin from "@/components/logo/LogoOrigin";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { cn } from "@/lib/utils";
 import type { TimelineEntry } from "./timeline.types";
 
 /** Draggable photo stack shown on the side opposite the card. Each card takes
@@ -18,11 +17,13 @@ function PhotoCluster({
   photos,
   mounted,
   progress,
+  sizeClass = "w-[clamp(160px,24vw,340px)] h-[clamp(160px,24vw,340px)]",
 }: {
   photos: string[];
   mounted: boolean;
   /** 0→1, tied directly to the row's scroll position — never a discrete pop. */
   progress: MotionValue<number>;
+  sizeClass?: string;
 }) {
   const opacity = useTransform(progress, [0, 1], [0, 1]);
   const scale = useTransform(progress, [0, 1], [0.85, 1]);
@@ -33,11 +34,10 @@ function PhotoCluster({
     // Square-ish bounding box (340 × 340) so portrait, landscape and square
     // shots all fit; each card shrink-wraps to its photo's aspect ratio inside
     // it. Tracks scroll position directly so it can never "pop" ahead of it.
-    <motion.div
-      className="w-[clamp(160px,24vw,340px)] h-[clamp(160px,24vw,340px)]"
-      style={{ opacity, scale, filter }}
-    >
+    <motion.div className={sizeClass} style={{ opacity, scale, filter }}>
       <Stack
+        // On phones a drag would fight page scrolling — tap to flip instead.
+        mobileClickOnly
         randomRotation
         sensitivity={180}
         sendToBackOnClick
@@ -55,14 +55,22 @@ function PhotoCluster({
 
 /** Animated piece shown in the photo slot (entry.showcase). Fades in with
  *  the row like the photo stack, then plays once it is in view. */
-function ShowcaseCluster({ mounted, progress }: { mounted: boolean; progress: MotionValue<number> }) {
+function ShowcaseCluster({
+  mounted,
+  progress,
+  sizeClass = "w-[clamp(180px,26vw,360px)]",
+}: {
+  mounted: boolean;
+  progress: MotionValue<number>;
+  sizeClass?: string;
+}) {
   const opacity = useTransform(progress, [0, 1], [0, 1]);
   const scale = useTransform(progress, [0, 1], [0.85, 1]);
 
   if (!mounted) return null;
   return (
     <motion.div style={{ opacity, scale }}>
-      <LogoOrigin className="w-[clamp(180px,26vw,360px)] aspect-[500/450]" />
+      <LogoOrigin className={`${sizeClass} aspect-[500/450]`} />
     </motion.div>
   );
 }
@@ -140,6 +148,23 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
           ) : null
         )}
       </div>
+
+      {/* Phones: the photo stack / showcase has no side column, so it sits
+          under the card instead. */}
+      {(entry.showcase || entry.photos?.length) && (
+        <div className="order-3 flex justify-center md:hidden sm:col-span-3">
+          {entry.showcase ? (
+            <ShowcaseCluster mounted={mounted} progress={scrollYProgress} sizeClass="w-[min(78vw,320px)]" />
+          ) : (
+            <PhotoCluster
+              photos={entry.photos!}
+              mounted={mounted}
+              progress={scrollYProgress}
+              sizeClass="w-[min(72vw,280px)] h-[min(72vw,280px)]"
+            />
+          )}
+        </div>
+      )}
     </li>
   );
 }

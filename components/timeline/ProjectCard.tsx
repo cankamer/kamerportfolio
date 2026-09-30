@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type MouseEvent } from "react";
+import { useEffect, useRef, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { pick } from "@/lib/i18n/config";
@@ -33,10 +33,17 @@ export default function ProjectCard({
 }) {
   const { locale, d } = useLocale();
   const accent = CATEGORY_ACCENT[entry.category];
-  const fromX = side === "left" ? -60 : 60;
+  const dir = side === "left" ? -1 : 1;
 
   const opacity = useTransform(progress, [0, 1], [0, 1]);
-  const x = useTransform(progress, [0, 1], [fromX, 0]);
+  // Slide in from the card's side. On phones the card spans the full width,
+  // so a small nudge keeps it from starting half off-screen.
+  // Measured after mount so server and client render the same first frame.
+  const offset = useRef(60);
+  useEffect(() => {
+    offset.current = window.innerWidth < 640 ? 16 : 60;
+  }, []);
+  const x = useTransform(progress, (v) => (1 - v) * dir * offset.current);
   const filter = useTransform(progress, [0, 1], ["blur(10px)", "blur(0px)"]);
 
   // --- 3D tilt (TiltedCard mechanics) ---------------------------------------

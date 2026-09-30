@@ -103,6 +103,7 @@ export interface Dictionary {
   };
   game: {
     controls: string;
+    controlsTouch: string;
     won: string;
     wonNote: string;
     lost: string;
@@ -203,6 +204,7 @@ const en: Dictionary = {
   },
   game: {
     controls: "← → / space",
+    controlsTouch: "drag to move · hold to fire",
     won: "You did it",
     wonNote: "you cleared the whole fleet",
     lost: "Game Over",
@@ -303,6 +305,7 @@ const tr: Dictionary = {
   },
   game: {
     controls: "← → / boşluk",
+    controlsTouch: "sürükle: hareket · basılı tut: ateş",
     won: "Başardın",
     wonNote: "tüm filoyu temizledin",
     lost: "Oyun Bitti",
@@ -403,6 +406,7 @@ const de: Dictionary = {
   },
   game: {
     controls: "← → / Leertaste",
+    controlsTouch: "ziehen: bewegen · halten: feuern",
     won: "Geschafft",
     wonNote: "du hast die ganze Flotte besiegt",
     lost: "Spiel vorbei",
