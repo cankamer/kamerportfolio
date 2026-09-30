@@ -7,6 +7,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import TimelineNode from "./TimelineNode";
 import ProjectCard from "./ProjectCard";
 import Stack from "@/components/ui/Stack";
+import LogoOrigin from "@/components/logo/LogoOrigin";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 import type { TimelineEntry } from "./timeline.types";
@@ -52,6 +53,20 @@ function PhotoCluster({
   );
 }
 
+/** Animated piece shown in the photo slot (entry.showcase). Fades in with
+ *  the row like the photo stack, then plays once it is in view. */
+function ShowcaseCluster({ mounted, progress }: { mounted: boolean; progress: MotionValue<number> }) {
+  const opacity = useTransform(progress, [0, 1], [0, 1]);
+  const scale = useTransform(progress, [0, 1], [0.85, 1]);
+
+  if (!mounted) return null;
+  return (
+    <motion.div style={{ opacity, scale }}>
+      <LogoOrigin className="w-[clamp(180px,26vw,360px)] aspect-[500/450]" />
+    </motion.div>
+  );
+}
+
 /**
  * One timeline row. Reveal is tied directly to the row's scroll position
  * (not a discrete IntersectionObserver flip), so the card/flower/photos
@@ -93,7 +108,11 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
           <ProjectCard entry={entry} side="left" progress={scrollYProgress} mounted={mounted} />
         ) : (
           // Card is on the right → photos sit on the LEFT, pushed off the path.
-          entry.photos?.length ? (
+          entry.showcase ? (
+            <div className="hidden min-w-0 md:block md:mr-8 lg:mr-20 xl:mr-32">
+              <ShowcaseCluster mounted={mounted} progress={scrollYProgress} />
+            </div>
+          ) : entry.photos?.length ? (
             <div className="hidden min-w-0 md:block md:mr-8 lg:mr-20 xl:mr-32">
               <PhotoCluster photos={entry.photos} mounted={mounted} progress={scrollYProgress} />
             </div>
@@ -110,7 +129,11 @@ function TimelineRow({ entry, side }: { entry: TimelineEntry; side: "left" | "ri
           <ProjectCard entry={entry} side="right" progress={scrollYProgress} mounted={mounted} />
         ) : (
           // Card is on the left → photos sit on the RIGHT, pushed off the path.
-          entry.photos?.length ? (
+          entry.showcase ? (
+            <div className="hidden min-w-0 md:block md:ml-8 lg:ml-20 xl:ml-32">
+              <ShowcaseCluster mounted={mounted} progress={scrollYProgress} />
+            </div>
+          ) : entry.photos?.length ? (
             <div className="hidden min-w-0 md:block md:ml-8 lg:ml-20 xl:ml-32">
               <PhotoCluster photos={entry.photos} mounted={mounted} progress={scrollYProgress} />
             </div>

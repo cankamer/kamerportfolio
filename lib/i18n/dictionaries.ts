@@ -80,6 +80,7 @@ export interface Dictionary {
   };
   categories: {
     ai: string;
+    design: string;
     electronics: string;
     robotics: string;
     social: string;
@@ -173,6 +174,7 @@ const en: Dictionary = {
   },
   categories: {
     ai: "Artificial Intelligence",
+    design: "Design",
     electronics: "Electronics / IoT",
     robotics: "Robotics",
     social: "Social Impact",
@@ -272,6 +274,7 @@ const tr: Dictionary = {
   },
   categories: {
     ai: "Yapay Zeka",
+    design: "Tasarım",
     electronics: "Elektronik / IoT",
     robotics: "Robotik",
     social: "Sosyal Etki",
@@ -371,6 +374,7 @@ const de: Dictionary = {
   },
   categories: {
     ai: "Künstliche Intelligenz",
+    design: "Design",
     electronics: "Elektronik / IoT",
     robotics: "Robotik",
     social: "Soziale Wirkung",

@@ -10,6 +10,7 @@ import type { Localized } from "@/lib/i18n/config";
 
 export type TimelineCategory =
   | "ai"
+  | "design"
   | "electronics"
   | "robotics"
   | "social"
@@ -18,6 +19,7 @@ export type TimelineCategory =
 /** Tailwind text-color utility per category (e.g. "text-gold"). */
 export const CATEGORY_ACCENT: Record<TimelineCategory, string> = {
   ai: "text-gold-bright",
+  design: "text-ivory-dim",
   electronics: "text-gold",
   robotics: "text-rose-bright",
   social: "text-rose",
@@ -63,4 +65,9 @@ export interface TimelineEntry {
    * under /public (e.g. "/projects/teknofest/1.jpg") or remote URLs.
    */
   photos?: string[];
+  /**
+   * Optional animated piece shown in the photo slot instead of `photos`
+   * (e.g. "logo-origin" plays the story of how the logo was made).
+   */
+  showcase?: "logo-origin";
 }

@@ -237,6 +237,24 @@ export const TIMELINE: TimelineEntry[] = [
     photos: ["/timeline/little-crusoe/1.png"],
   },
   {
+    // How my logo was born — the animation in the photo slot tells the story.
+    id: "logo",
+    period: "2020",
+    category: "design",
+    title: {
+      tr: "Logom",
+      en: "My Logo",
+      de: "Mein Logo",
+    },
+    description: {
+      tr: "Hayatımı \"hallederim, tamamdır, okey\" mottosuyla yaşıyorum. Logom da bu yüzden iki elimle yaptığım OK işaretlerinin birleşimi: iki halka üst üste gelince parmak uçları buluşuyor ve halkanın üstünde tabanı açık bir üçgen oluşuyor. Tek el değil iki el, çünkü bir elin nesi var, iki elin sesi var. Hayatta ekip işinin çok önemli olduğuna inanıyorum.",
+      en: "I live by the motto \"I'll handle it, done, okay.\" That's why my logo is two OK signs made with both hands, joined together: when the two rings overlap, the fingertips meet and form an open triangle above the ring. Two hands, not one — as the Turkish saying goes, one hand alone makes no sound, but two hands together do. I believe teamwork matters a great deal in life.",
+      de: "Ich lebe nach dem Motto \"Ich regle das, erledigt, okay.\" Deshalb besteht mein Logo aus zwei OK-Zeichen, die ich mit beiden Händen forme und zusammenführe: Legen sich die beiden Ringe übereinander, treffen sich die Fingerspitzen und bilden ein offenes Dreieck über dem Ring. Zwei Hände statt einer — denn wie ein türkisches Sprichwort sagt: Eine Hand allein macht keinen Laut, zwei Hände zusammen schon. Ich glaube, dass Teamarbeit im Leben sehr wichtig ist.",
+    },
+    tags: ["Logo", "Brand Identity", "SVG", "Motion"],
+    showcase: "logo-origin",
+  },
+  {
     // The very first build of the journey — a mid-term-break Arduino project.
     id: "tog",
     // Locale-neutral DD.MM.YYYY.
