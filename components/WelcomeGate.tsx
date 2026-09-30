@@ -138,26 +138,6 @@ export default function WelcomeGate() {
         >
           <Starfield />
 
-          {/* Welcome label above the card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="flex items-center gap-3 text-center"
-          >
-            <span
-              className="h-px w-10 sm:w-16"
-              style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.3))" }}
-            />
-            <p className="font-sans text-[10px] uppercase tracking-[0.4em] text-white/40">
-              {d.gate.welcome}
-            </p>
-            <span
-              className="h-px w-10 sm:w-16"
-              style={{ background: "linear-gradient(to left, transparent, rgba(255,255,255,0.3))" }}
-            />
-          </motion.div>
-
           {/* ProfileCard */}
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.93 }}
@@ -166,7 +146,7 @@ export default function WelcomeGate() {
           >
             <ProfileCard
               name="Kamer Can"
-              title={d.hero.eyebrow}
+              title=""
               handle="kamercan"
               status={d.gate.available}
               contactText={d.gate.diveIn}
