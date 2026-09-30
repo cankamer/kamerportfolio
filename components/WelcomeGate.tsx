@@ -170,7 +170,7 @@ export default function WelcomeGate() {
               handle="kamercan"
               status={d.gate.available}
               contactText={d.gate.diveIn}
-              avatarUrl="/photos/avatar.png"
+              avatarUrl="/photos/avatar.jpg"
               showUserInfo={false}
               enableTilt={true}
               enableMobileTilt={false}
