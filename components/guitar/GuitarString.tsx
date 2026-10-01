@@ -184,7 +184,7 @@ export default function GuitarString({
           d={d}
           fill="none"
           stroke="transparent"
-          strokeWidth={14}
+          strokeWidth={18}
           strokeLinecap="round"
           style={{ pointerEvents: "stroke", cursor: "pointer" }}
           onPointerEnter={(e) => strum(0.8, e.clientX, e.clientY)}

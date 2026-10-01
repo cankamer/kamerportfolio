@@ -56,7 +56,8 @@ export default function InteractiveGuitarStrings() {
   const { d } = useLocale();
 
   const [dims, setDims] = useState({ w: 0, h: 0 });
-  const [orientation, setOrientation] = useState<Orientation>("horizontal");
+  // Strings always run horizontally, on phones too.
+  const orientation: Orientation = "horizontal";
   const [reduced, setReduced] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
 
@@ -87,10 +88,8 @@ export default function InteractiveGuitarStrings() {
 
     const rect = el.getBoundingClientRect();
     const jrect = journey.getBoundingClientRect();
-    const o = window.innerWidth < 560 ? "vertical" : "horizontal";
-    const ls = computeLanes(o, rect.width, rect.height);
-    const breakLane = ls[BREAKING_STRING_INDEX] ?? rect.height;
-    const topPx = o === "vertical" ? rect.height : breakLane;
+    const ls = computeLanes("horizontal", rect.width, rect.height);
+    const topPx = ls[BREAKING_STRING_INDEX] ?? rect.height;
 
     const startDoc = rect.top + window.scrollY + topPx;
     // Extend all the way to the BOTTOM of #journey-path so the vine IS the path.
@@ -107,11 +106,13 @@ export default function InteractiveGuitarStrings() {
     const topDoc  = startDoc;
     const leftDoc = jrect.left + window.scrollX;
 
-    // Measure each card's vertical center in document coords → convert to vine-relative Y.
-    // These become the exact crossing points where the vine passes through the center axis.
-    const liEls = document.querySelectorAll<HTMLElement>("#journey-path > ol > li");
-    const crossingYs = Array.from(liEls).map((li) => {
-      const r = li.getBoundingClientRect();
+    // Measure each FLOWER's vertical center in document coords → vine-relative Y.
+    // These become the exact crossing points where the vine passes through the
+    // center axis. (Not the row centers: on phones the flower sits above its
+    // card, far from the middle of the row.)
+    const nodeEls = document.querySelectorAll<HTMLElement>("#journey-path [data-timeline-node]");
+    const crossingYs = Array.from(nodeEls).map((n) => {
+      const r = n.getBoundingClientRect();
       return (r.top + window.scrollY + r.height / 2) - startDoc;
     });
     const segments = crossingYs.length || 4;
@@ -135,7 +136,6 @@ export default function InteractiveGuitarStrings() {
             : prev
         );
       }
-      setOrientation(window.innerWidth < 560 ? "vertical" : "horizontal");
       if (brokenRef.current) computeVine();
     };
     update();
@@ -151,13 +151,13 @@ export default function InteractiveGuitarStrings() {
 
   // --- Periodic "pluck me" invitation until the first real strum -----------
   useEffect(() => {
-    if (reduced || orientation !== "horizontal") return;
+    if (reduced) return;
     const id = setInterval(() => {
       if (playedRef.current || brokenRef.current) return;
       setInvite((n) => n + 1);
     }, 3400);
     return () => clearInterval(id);
-  }, [reduced, orientation]);
+  }, [reduced]);
 
   // --- prefers-reduced-motion ----------------------------------------------
   useEffect(() => {
@@ -321,7 +321,8 @@ export default function InteractiveGuitarStrings() {
     <div
       ref={containerRef}
       className="relative w-full"
-      style={{ height: orientation === "vertical" ? "52vh" : "11rem" }}
+      // Vertical swipes still scroll the page; tapping a string plucks it.
+      style={{ height: "11rem", touchAction: "pan-y" }}
     >
       {ready && (
         <svg
@@ -359,11 +360,11 @@ export default function InteractiveGuitarStrings() {
       )}
 
       {/* Track info above the strings */}
-      {ready && !broken && orientation === "horizontal" && (
+      {ready && !broken && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="pointer-events-none absolute inset-x-0 -top-9 flex items-center justify-center gap-2 font-sans text-[10px] uppercase tracking-[0.3em] text-gold-dim"
+          className="pointer-events-none absolute inset-x-0 -top-9 flex items-center justify-center gap-2 whitespace-nowrap font-sans text-[9px] uppercase tracking-[0.18em] text-gold-dim sm:text-[10px] sm:tracking-[0.3em]"
         >
           <AudioUnlockOrb armed={unlocked} />
           <span className="text-ivory-dim">Romance Anónimo</span>
@@ -376,7 +377,7 @@ export default function InteractiveGuitarStrings() {
           animated equalizer so the "pluck to play" call-to-action is obvious.
           Fades out once the user has strummed for the first time. */}
       <AnimatePresence>
-        {ready && !broken && !played && orientation === "horizontal" && (
+        {ready && !broken && !played && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -384,11 +385,11 @@ export default function InteractiveGuitarStrings() {
             className="pointer-events-none absolute inset-x-0 -bottom-10 flex items-center justify-center"
           >
             <div
-              className="flex items-center gap-2.5 rounded-full border border-gold/40 bg-obsidian/50 px-4 py-1.5 backdrop-blur-sm"
+              className="flex items-center gap-2 rounded-full border border-gold/40 bg-obsidian/50 px-3.5 py-1.5 backdrop-blur-sm sm:gap-2.5 sm:px-4"
               style={{ boxShadow: "0 0 18px rgba(201,162,75,0.28)" }}
             >
               <EqualizerBars />
-              <span className="font-sans text-[11px] uppercase tracking-[0.26em] text-gold-bright">
+              <span className="whitespace-nowrap font-sans text-[10px] uppercase tracking-[0.14em] text-gold-bright sm:text-[11px] sm:tracking-[0.26em]">
                 {d.hero.strumHint}
               </span>
             </div>
@@ -413,6 +414,7 @@ export default function InteractiveGuitarStrings() {
             heightPx={vine.heightPx}
             segments={vine.segments}
             crossingYs={vine.crossingYs}
+            docTop={vine.topDoc}
             strokeWidth={GUITAR_STRINGS[BREAKING_STRING_INDEX].thickness}
             reduced={reduced}
             anchorX={vine.rightPx}

@@ -2,11 +2,13 @@
 
 import {
   motion,
+  useMotionValueEvent,
   useSpring,
   useTransform,
 } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { WINDING_AMPLITUDE_RATIO } from "./buildPaths";
-import { sharedPathProgress, sharedVineRatio } from "@/lib/sharedPath";
+import { cometHeadY, sharedPathProgress, sharedVineRatio } from "@/lib/sharedPath";
 
 interface RoadmapVineProps {
   widthPx: number;
@@ -19,6 +21,8 @@ interface RoadmapVineProps {
   /** Vine-relative X where the left edge of the screen is (the broken end). */
   leftEdgeX?: number;
   crossingYs?: number[]; // vine-relative Y positions where path crosses center axis
+  /** Document-space Y of the vine's top, to publish the comet head's page position. */
+  docTop?: number;
 }
 
 // marble-light (#21212a) is near-invisible on obsidian (#0a0a0c); use a
@@ -33,6 +37,7 @@ export default function RoadmapVine({
   anchorX = 0,
   leftEdgeX = 0,
   crossingYs,
+  docTop = 0,
 }: RoadmapVineProps) {
   // Scroll progress: shared 0→1 (vineRatio=1 so this equals sharedPathProgress)
   const rawScrollYProgress = useTransform(
@@ -184,6 +189,42 @@ export default function RoadmapVine({
   const dRest = buildRest();
 
   const restPathLength = useTransform(cometOffset, (v) => Math.max(0, (v - R) / (1 - R)));
+
+  // Publish where the lit line's leading edge is on the page, so each flower
+  // can bloom the moment the line reaches it. Measured on the real path
+  // geometry (a detached <path> holding the current `d`), not estimated.
+  const probe = useRef<SVGPathElement | null>(null);
+  const frame = useRef(0);
+  const measureHead = () => {
+    if (!probe.current) {
+      probe.current = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    }
+    const el = probe.current;
+    el.setAttribute("d", dDynamic.get());
+    const total = el.getTotalLength();
+    if (!total) return;
+    const frac = Math.min(1, cometOffset.get() + headLength.get());
+    cometHeadY.set(docTop + el.getPointAtLength(frac * total).y);
+  };
+  // Deferred to the next frame (and coalesced): the value can change while
+  // React is rendering, and flowers re-render in response to it.
+  const publishHead = () => {
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = 0;
+      measureHead();
+    });
+  };
+  useMotionValueEvent(cometOffset, "change", publishHead);
+  useEffect(() => {
+    publishHead();
+    return () => {
+      cancelAnimationFrame(frame.current);
+      frame.current = 0;
+      cometHeadY.set(-1);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [docTop, heightPx, widthPx, crossingYs]);
 
   return (
     <div aria-hidden className="pointer-events-none w-full" style={{ height: heightPx }}>
