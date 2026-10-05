@@ -11,7 +11,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ScrollToTopOnLoad from "@/components/ScrollToTopOnLoad";
 import SmoothScroll from "@/components/SmoothScroll";
 
-const SITE_TITLE = "Kamer Can — Creative Technologist";
+const SITE_TITLE = "Kamer Can — Engineer & Maker";
 const SITE_DESCRIPTION =
   "Kamer Can — Computer Engineering student building at the seam of AI, electronics and software. A neo-classical, baroque-inspired portfolio.";
 
