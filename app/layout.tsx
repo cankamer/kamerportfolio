@@ -11,10 +11,29 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ScrollToTopOnLoad from "@/components/ScrollToTopOnLoad";
 import SmoothScroll from "@/components/SmoothScroll";
 
+const SITE_TITLE = "Kamer Can — Creative Technologist";
+const SITE_DESCRIPTION =
+  "Kamer Can — Computer Engineering student building at the seam of AI, electronics and software. A neo-classical, baroque-inspired portfolio.";
+
+// Link previews (LinkedIn, WhatsApp, X…) read these tags; the preview image
+// itself is app/opengraph-image.png, which Next.js wires up automatically.
 export const metadata: Metadata = {
-  title: "Kamer Can — Creative Technologist",
-  description:
-    "Kamer Can — Computer Engineering student building at the seam of AI, electronics and software. A neo-classical, baroque-inspired portfolio.",
+  metadataBase: new URL("https://www.cankamer.com"),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "Kamer Can",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default async function RootLayout({
