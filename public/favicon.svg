@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" width="380" height="530" viewBox="13 5 38 53">
+  <title>Kamer Can mark (for dark backgrounds)</title>
+  <defs>
+    <linearGradient id="metal" gradientUnits="userSpaceOnUse" x1="10" y1="6" x2="54" y2="58">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#d9dbe0"/>
+      <stop offset="1" stop-color="#9ea2aa"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/>
+      <feOffset dy="1.6" result="blur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.85"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadowonly" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/>
+      <feOffset dy="1.6" result="blur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.85"/>
+      <feComposite in2="blur" operator="in"/>
+    </filter>
+    <mask id="onmark" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <circle cx="32" cy="42" r="12.5" fill="none" stroke="#ffffff" stroke-width="3.4"/>
+      <path d="M19.39 40.38 L32 9 L44.61 40.38" fill="none" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g inkscape:label="mark">
+    <circle inkscape:label="ring" cx="32" cy="42" r="12.5" fill="none" stroke="url(#metal)" stroke-width="3.4"/>
+    <path inkscape:label="left bar" d="M19.39 40.38 L32 9" fill="none" stroke="url(#metal)" stroke-width="3.8" stroke-linecap="round" filter="url(#shadow)"/>
+    <path inkscape:label="right bar" d="M32 9 L44.61 40.38" fill="none" stroke="url(#metal)" stroke-width="3.8" stroke-linecap="round" filter="url(#shadow)"/>
+  </g>
+</svg>
