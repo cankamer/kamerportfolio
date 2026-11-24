@@ -64,7 +64,6 @@ sectionsEl.innerHTML = SECTIONS.map((s, i) => {
     <section class="sec" id="${s.id}" style="--accent:${s.accent}" aria-labelledby="t-${s.id}">
       <header class="sec-head">
         ${pendant(s.id, 60 + ((i * 37) % 60))}
-        <p class="sec-kicker"><b>${pad(i + 1)}</b>${esc(s.kicker)}</p>
         <h2 class="sec-title" id="t-${s.id}">${emTitle(s.title)}</h2>
         <p class="sec-lead">${esc(s.lead)}</p>
       </header>

@@ -47,13 +47,10 @@ export const SECTIONS = [
       {
         type: 'timeline',
         items: [
-          ['Now', 'YTU Computer Engineering', 'First year. Part of GDG on Campus YTU and CASMarine.'],
           ['Now', 'Haneko', 'Co-founder and CTO of the startup we started with friends.'],
           ['2026', '100 StaryUP Hackathon', 'An AI-powered logistics automation prototype in 48 hours.'],
           ['2022 — 2024', 'Teknofest Artificial Intelligence', 'First team captain, then a member. A project on cancer detection with computer vision.'],
-          ['2021 — 2023', 'Deneyap Workshops', 'Robotics, IoT and embedded systems.'],
           ['2021', 'Little Crusoe', 'My first big game, made in Scratch.'],
-          ['2020', 'First Arduino projects', 'Smart-home curtains and lights, an automatic garage that senses rain.'],
         ],
       },
       { type: 'p', text: 'I volunteered at the Turkish Spinal Cord Paralytics Association.' },
