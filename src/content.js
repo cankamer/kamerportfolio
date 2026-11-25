@@ -180,7 +180,7 @@ export const SECTIONS = [
     kicker: 'Startup',
     title: '*Haneko*',
     lead:
-      'Haneko is the startup I co-founded with friends: a platform that pairs small companies with the finance professionals (SMMM/YMM) who handle their tax, finance and payroll. As co-founder and CTO I build the product, and most of its code is mine.',
+      'Haneko is the startup I co-founded with friends: a platform that pairs small companies with the finance professionals (SMMM/YMM) who handle their tax, finance and payroll. As co-founder and CTO I build the product.',
     blocks: [
       { type: 'img', src: '/media/haneko-mark.svg', alt: 'Haneko logo: a cat wearing headphones', caption: 'Haneko’s logo: a cat with headphones.' },
       { type: 'h', text: 'What I built' },
@@ -326,11 +326,6 @@ export const SECTIONS = [
           ['198', 'views'],
           ['14', 'likes'],
         ],
-      },
-      {
-        type: 'quote',
-        text: '“me: *sees sans* OH YES I MUST PLAY THIS :)”',
-        cite: 'the_only_dogepig · one of the comments on Scratch',
       },
       { type: 'h', text: 'Unreal Engine 5' },
       {

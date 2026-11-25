@@ -490,40 +490,108 @@ export function runnerWidget() {
 
 /* ───────────────────────── Haneko health score ───────────────────────── */
 
+// A port of Haneko's own HealthScoreCard (webapp/src/components/health-score-card.tsx, light theme):
+// a 270° arc that fills to the score with a gradient in the band's colour and a ringed dot at its
+// tip, an odometer number whose digits roll (a higher digit only turns at the very end of the lower
+// one's turn, like a real counter), the band label, "Why not 100?" with the issues by severity, and
+// the list that opens below. Labels are Haneko's English UI text; the score and issues are samples.
+const HK = { success: '#10b981', warning: '#f59e0b', error: '#ef4444' };
+const ARC = [-135, 135];
+const G = { size: 92, stroke: 8 };
+G.r = (G.size - G.stroke) / 2 - 1;
+const polar = (a) => {
+  const rad = ((a - 90) * Math.PI) / 180;
+  return { x: G.size / 2 + G.r * Math.cos(rad), y: G.size / 2 + G.r * Math.sin(rad) };
+};
+const arcD = (() => {
+  const s = polar(ARC[0]);
+  const e = polar(ARC[1]);
+  return `M ${s.x} ${s.y} A ${G.r} ${G.r} 0 1 1 ${e.x} ${e.y}`;
+})();
+const HEALTH = {
+  score: 72,
+  issues: [
+    ['yuksek', 'A tax filing is due in 3 days'],
+    ['orta', 'Cash covers less than 3 months of expenses'],
+    ['dusuk', 'Two invoices have been unpaid for over 30 days'],
+  ],
+};
+const SEV = { kritik: ['Critical', 'error'], yuksek: ['High', 'error'], orta: ['Medium', 'warning'], dusuk: ['Low', 'success'] };
+const DIGIT_H = 28;
+
 export function healthWidget() {
-  const C = 2 * Math.PI * 52;
+  const score = HEALTH.score;
+  const band = score >= 80 ? ['Good', HK.success] : score >= 50 ? ['Fair', HK.warning] : ['At risk', HK.error];
+  const places = Array.from({ length: String(score).length }, (_, i) => 10 ** (String(score).length - 1 - i));
+  const counts = Object.keys(SEV)
+    .map((k) => [k, HEALTH.issues.filter(([s]) => s === k).length])
+    .filter(([, n]) => n);
+  const badge = (k) => `<span class="hk-badge" style="--tone:${HK[SEV[k][1]]}">${SEV[k][0]}</span>`;
   const el = h(`
-    <div class="widget">
-      <div class="gauge">
-        <svg viewBox="0 0 132 132">
-          <circle class="g-track" cx="66" cy="66" r="52" fill="none" stroke-width="12" />
-          <circle class="g-arc" cx="66" cy="66" r="52" fill="none" stroke="#652fe7" stroke-width="12" stroke-linecap="round"
-            stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 66 66)" />
-          <text class="g-num" x="66" y="74" text-anchor="middle">0</text>
-          <text class="g-sub" x="66" y="92" text-anchor="middle">HEALTH SCORE</text>
-        </svg>
-        <ul>
-          <li><i><svg viewBox="0 0 12 12"><path d="M2 6.5 5 9l5-6" /></svg></i>Cash covers at least 3 months</li>
-          <li><i><svg viewBox="0 0 12 12"><path d="M2 6.5 5 9l5-6" /></svg></i>At least 20% of revenue stays as profit</li>
-          <li><i><svg viewBox="0 0 12 12"><path d="M2 6.5 5 9l5-6" /></svg></i>No missed tax deadlines</li>
-        </ul>
+    <div class="widget hk-wrap">
+      <div class="hk-card" style="--band:${band[1]}">
+        <div class="hk-row">
+          <div class="hk-gauge">
+            <svg width="${G.size}" height="${G.size}" viewBox="0 0 ${G.size} ${G.size}" aria-hidden="true">
+              <defs><linearGradient id="hk-grad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" stop-color="${band[1]}" stop-opacity="0.45" /><stop offset="100%" stop-color="${band[1]}" />
+              </linearGradient></defs>
+              <path d="${arcD}" fill="none" stroke="rgb(204 203 206 / 0.5)" stroke-width="${G.stroke}" stroke-linecap="round" />
+              <path class="hk-fill" d="${arcD}" fill="none" stroke="url(#hk-grad)" stroke-width="${G.stroke}" stroke-linecap="round" />
+              <circle class="hk-tip" r="4.5" fill="#fefeff" stroke="${band[1]}" stroke-width="3" />
+            </svg>
+            <div class="hk-num" role="img" aria-label="Health score ${score} out of 100">
+              <span class="hk-digits">${places.map(() => `<span class="hk-digit"><span>${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((d) => `<i>${d}</i>`).join('')}</span></span>`).join('')}</span>
+              <span class="hk-of">/ 100</span>
+            </div>
+          </div>
+          <div class="hk-mid">
+            <div class="hk-head">
+              <h4>Health Score</h4>
+              <span class="hk-band">${band[0]}</span>
+            </div>
+            <div class="hk-why">
+              <button type="button" class="hk-btn" aria-expanded="false">Why not 100?
+                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button>
+              <div class="hk-counts">${counts.map(([k, n]) => `<span>${badge(k)}<b>${n}</b></span>`).join('')}</div>
+            </div>
+          </div>
+        </div>
+        <div class="hk-list"><ul>${HEALTH.issues.map(([k, t]) => `<li>${badge(k)}<span>${t}</span></li>`).join('')}</ul></div>
       </div>
-      <div class="widget-bar"><span class="widget-note">Health score checks in Haneko · sample data</span></div>
+      <div class="widget-bar"><span class="widget-note">Haneko’s health score card · sample data</span></div>
     </div>`);
-  const arc = el.querySelector('.g-arc');
-  const num = el.querySelector('.g-num');
+
+  const fill = el.querySelector('.hk-fill');
+  const tip = el.querySelector('.hk-tip');
+  const strips = [...el.querySelectorAll('.hk-digit > span')];
+  const len = fill.getTotalLength();
+  fill.style.strokeDasharray = `${len} ${len + 1}`;
+  const set = (v) => {
+    fill.style.strokeDashoffset = `${len * (1 - v / 100)}`;
+    const p = polar(ARC[0] + (ARC[1] - ARC[0]) * (v / 100));
+    tip.setAttribute('cx', p.x);
+    tip.setAttribute('cy', p.y);
+    strips.forEach((s, i) => {
+      const scaled = v / places[i];
+      const whole = Math.floor(scaled);
+      s.style.transform = `translateY(${-((whole % 10) + (scaled - whole) ** 10) * DIGIT_H}px)`;
+    });
+  };
+  set(0);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const state = { v: 0 };
-  const tl = gsap.timeline({ delay: 0.7 });
-  tl.to(state, {
-    v: 82,
-    duration: 1.8,
-    ease: 'expo.out',
-    onUpdate: () => {
-      arc.setAttribute('stroke-dashoffset', C * (1 - state.v / 100));
-      num.textContent = Math.round(state.v);
-    },
+  const tl = gsap.timeline({ delay: 0.5 });
+  tl.to(state, { v: score, duration: 1.4, ease: 'expo.out', onUpdate: () => set(state.v) });
+  tl.add(() => el.querySelector('.hk-card').classList.add('in'), 0.55);
+  if (still) tl.progress(1);
+
+  const btn = el.querySelector('.hk-btn');
+  btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    el.querySelector('.hk-card').classList.toggle('open', open);
   });
-  el.querySelectorAll('li').forEach((li, i) => tl.add(() => li.classList.add('ok'), 0.4 + i * 0.4));
   return { el, destroy: () => tl.kill() };
 }
 

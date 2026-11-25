@@ -191,6 +191,101 @@ $('#btn-menu').addEventListener('click', () => toggleMenu());
 menu.addEventListener('click', (e) => (e.target.closest('a') || e.target === menu) && toggleMenu(false));
 $('.hero-enter').addEventListener('click', () => $('#about').scrollIntoView({ behavior: still ? 'auto' : 'smooth' }));
 
+/* ───────────────────────── The hero arrow, drawn like a pen ───────────────────────── */
+
+// The pen slows down where the line bends (the little curl) and speeds up on the long sweep, with a
+// round pen tip riding the end of the line. While it draws, the line "boils" a little (the scribble
+// filter's noise changes a few times a second, like hand-drawn animation), then settles. The head
+// is flicked on in two quick strokes. Phones hide the arrow; reduced motion shows it finished.
+function drawArrow() {
+  const svg = $('.ld-arrow');
+  if (!svg || svg.dataset.drawn || getComputedStyle(svg).display === 'none') return;
+  svg.dataset.drawn = '1';
+  const line = $('.ld-arrow-line', svg);
+  const heads = $$('.ld-arrow-head', svg);
+  const pen = $('.ld-pen', svg);
+  const noise = $('#scribble feTurbulence');
+  const L = line.getTotalLength();
+  const show = (p, len) => ((p.style.strokeDasharray = `${len} ${len + 1}`), (p.style.strokeDashoffset = `${len}`), (p.style.opacity = 1));
+  show(line, L);
+  heads.forEach((h) => show(h, h.getTotalLength()));
+  if (still) {
+    line.style.strokeDashoffset = 0;
+    heads.forEach((h) => (h.style.strokeDashoffset = 0));
+    return;
+  }
+
+  // time weight per small piece of the line: a sharper turn takes longer to draw
+  const N = 160;
+  const pts = Array.from({ length: N + 1 }, (_, i) => line.getPointAtLength((L * i) / N));
+  const weight = pts.map((p, i) => {
+    if (i === 0 || i === N) return 1;
+    const a = Math.atan2(p.y - pts[i - 1].y, p.x - pts[i - 1].x);
+    const b = Math.atan2(pts[i + 1].y - p.y, pts[i + 1].x - p.x);
+    let turn = Math.abs(b - a);
+    if (turn > Math.PI) turn = 2 * Math.PI - turn;
+    return 1 + turn * 9;
+  });
+  const cum = [0];
+  for (let i = 1; i <= N; i++) cum.push(cum[i - 1] + (weight[i - 1] + weight[i]) / 2);
+  const total = cum[N];
+  // drawn fraction of the length after a fraction u of the drawing time
+  const lengthAt = (u) => {
+    const target = u * total;
+    let i = 1;
+    while (i < N && cum[i] < target) i++;
+    const f = (target - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
+    return ((i - 1 + f) / N) * L;
+  };
+  const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2) * 0.35 + u * 0.65; // a gentle start and stop
+
+  const START = 900; // ms after load, once the greeting has faded in
+  const LINE = 1500;
+  const HEAD = [170, 150]; // the two strokes of the head
+  const GAP = 70;
+  let t0 = 0;
+  let lastBoil = 0;
+  const boil = (now, on) => {
+    if (!noise) return;
+    if (!on) return noise.setAttribute('seed', '7');
+    if (now - lastBoil > 110) (lastBoil = now), noise.setAttribute('seed', String(7 + Math.floor(Math.random() * 40)));
+  };
+  const frame = (now) => {
+    if (!t0) t0 = now;
+    const t = now - t0;
+    const u = Math.min(1, t / LINE);
+    const len = lengthAt(ease(u));
+    line.style.strokeDashoffset = `${L - len}`;
+    const p = line.getPointAtLength(len);
+    pen.setAttribute('cx', p.x);
+    pen.setAttribute('cy', p.y);
+    pen.classList.toggle('on', u > 0 && u < 1);
+    let done = u >= 1;
+    let at = LINE + GAP;
+    heads.forEach((hd, i) => {
+      const hl = hd.getTotalLength();
+      const v = Math.max(0, Math.min(1, (t - at) / HEAD[i]));
+      hd.style.strokeDashoffset = `${hl * (1 - (1 - Math.pow(1 - v, 3)))}`;
+      if (v > 0 && v < 1) {
+        const q = hd.getPointAtLength(hl * (1 - Math.pow(1 - v, 3)));
+        pen.setAttribute('cx', q.x), pen.setAttribute('cy', q.y), pen.classList.add('on');
+      }
+      if (v < 1) done = false;
+      at += HEAD[i] + GAP;
+    });
+    boil(now, !done);
+    if (done) {
+      pen.classList.remove('on');
+      return;
+    }
+    requestAnimationFrame(frame);
+  };
+  setTimeout(() => requestAnimationFrame(frame), START);
+}
+drawArrow();
+// a phone turned (or a window widened) to where the arrow appears draws it then
+matchMedia('(min-width: 821px)').addEventListener('change', (e) => e.matches && drawArrow());
+
 new IntersectionObserver(([e]) => bar.classList.toggle('show', !e.isIntersecting), { rootMargin: '-60% 0px 0px 0px' }).observe($('#hero'));
 const navLinks = new Map($$('#nav a').map((a) => [a.hash.slice(1), a]));
 const sectionSpy = new IntersectionObserver(

@@ -57,9 +57,13 @@ img { max-width: 100%; }
 .ld-text { max-width: 600px; text-align: left; }
 .ld-blurb { margin: 0; font-size: calc(21px * var(--t)); line-height: 1.35; letter-spacing: -0.01em; color: var(--ink); opacity: 0; animation: fade 0.9s 0.5s forwards; }
 .ld-arrow { position: absolute; right: 100%; top: 50%; transform: translate(18px, calc(-52.5% + 44px)); width: min(58vw, 1150px); height: auto; overflow: visible; pointer-events: none; filter: url(#scribble); }
-.ld-arrow path { stroke: #f3efe4; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
-.ld-arrow-line { opacity: 0; animation: draw 1.3s 1s var(--ease-io) forwards, show 0s 1.05s forwards; }
-.ld-arrow-head { opacity: 0; animation: draw 0.4s 2.2s var(--ease-out) forwards, show 0s 2.25s forwards; }
+/* drawn by site.js like a pen: dash offsets are set per frame; before the script runs nothing shows */
+.ld-arrow path { stroke: #f3efe4; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.ld-pen { fill: #f3efe4; opacity: 0; transition: opacity 0.35s; }
+.ld-pen.on { opacity: 1; }
+/* hovering the button: the arrow head leans in towards it */
+.ld-arrow-tip { transform-box: view-box; transition: transform 0.6s var(--ease-out); }
+.ld-right:has(.hero-enter:hover) .ld-arrow-tip { transform: translate(9px, -4px); }
 .hero-enter {
   position: relative; display: grid; align-items: center; justify-items: center;
   height: clamp(76px, 9vw, 128px); padding: 0 clamp(36px, 3.6vw, 64px); border-radius: 999px; white-space: nowrap;
@@ -309,18 +313,48 @@ a.card .card-top { padding-right: 26px; }
 .histos canvas { display: block; width: 100%; height: 46px; }
 .runner { position: relative; aspect-ratio: 16 / 7; background: #0f1a2a; cursor: pointer; touch-action: manipulation; }
 .runner canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
-.gauge { display: grid; grid-template-columns: 132px 1fr; gap: 20px; align-items: center; padding: 18px; }
-.gauge svg { width: 132px; height: 132px; }
-.gauge .g-num { font-size: 34px; font-weight: 750; letter-spacing: -0.05em; fill: var(--ink); }
-.gauge .g-sub { font-size: 8px; font-weight: 600; letter-spacing: 0.12em; fill: var(--ink-3); }
-.gauge .g-track { stroke: rgba(25,23,20,0.08); }
-.gauge ul { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(10px * var(--t)); }
-.gauge li { display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: calc(8px * var(--t)); font-size: calc(13px * var(--t)); color: var(--ink-2); line-height: 1.4; opacity: 0.3; transition: opacity 0.5s; }
-.gauge li.ok { opacity: 1; }
-.gauge li i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: rgba(25,23,20,0.08); }
-.gauge li.ok i { background: #10b981; }
-.gauge li i svg { width: 12px; height: 12px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 0.5s 0.15s; }
-.gauge li.ok i svg { stroke-dashoffset: 0; }
+/* Haneko's health score card (its own light-theme tokens: Inter, #fefeff surface, 12px radius, card shadow);
+   the whole card is zoomed with the site's text scale so its proportions stay as in the app */
+.hk-wrap { background: #fcfcfc; }
+.hk-card { zoom: var(--t); container-type: inline-size; margin: 16px; padding: 16px; border-radius: 12px; border: 1px solid rgb(204 203 206 / 0.5); background: #fefeff; box-shadow: 0 1px 2px 0 rgb(44 47 51 / 0.05), 0 1px 3px 0 rgb(44 47 51 / 0.06); font-family: var(--sans); color: #1c1c1f; }
+.hk-row { display: flex; align-items: center; gap: 20px; }
+.hk-gauge { position: relative; width: 92px; height: 92px; flex: none; }
+.hk-gauge svg { display: block; overflow: visible; }
+.hk-num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.hk-digits { display: flex; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--band); }
+.hk-digit { position: relative; display: block; overflow: hidden; height: 28px; width: 1ch; }
+.hk-digit > span { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; }
+.hk-digit i { display: block; height: 28px; line-height: 28px; text-align: center; font-style: normal; }
+.hk-of { font-size: 9px; font-weight: 500; color: #5c5b63; }
+.hk-mid { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.hk-head { display: flex; flex-direction: column; gap: 6px; }
+.hk-head h4 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: 0; }
+.hk-band { font-size: 16px; font-weight: 700; line-height: 1; color: var(--band); opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.hk-why { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+.hk-btn { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: 600 12px var(--sans); color: #1c1c1f; cursor: pointer; transition: background 0.2s; }
+.hk-btn:hover { background: rgb(204 203 206 / 0.2); }
+.hk-btn svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.hk-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.hk-counts { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.hk-counts > span { display: inline-flex; align-items: center; opacity: 0; transform: scale(0.9); transition: opacity 0.25s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.hk-counts > span:nth-child(2) { transition-delay: 0.07s; }
+.hk-counts > span:nth-child(3) { transition-delay: 0.14s; }
+.hk-counts b { margin-left: 4px; font-size: 12px; font-weight: 500; }
+.hk-card.in .hk-band, .hk-card.in .hk-counts > span { opacity: 1; transform: none; }
+.hk-badge { display: inline-flex; align-items: center; white-space: nowrap; padding: 4px 12px; border-radius: 999px; font-size: 11px; line-height: 16px; font-weight: 600; color: #ededed; background: var(--tone); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 -1px 0 rgb(0 0 0 / 0.14); }
+/* the issue list opens below (height animated through a 0fr → 1fr grid row) */
+.hk-list { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s; }
+.hk-card.open .hk-list { grid-template-rows: 1fr; opacity: 1; }
+.hk-list ul { min-height: 0; overflow: hidden; list-style: none; margin: 0; padding: 0; }
+.hk-list li { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; font-size: 14px; line-height: 1.45; }
+.hk-list li:first-child { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgb(204 203 206 / 0.5); }
+.hk-list li .hk-badge { margin-top: 1px; }
+/* narrow card: everything stacks and centres, as in the app */
+@container (max-width: 447px) {
+  .hk-row, .hk-mid { flex-direction: column; gap: 12px; }
+  .hk-mid { gap: 8px; }
+  .hk-head { align-items: center; }
+}
 .logo-draw { display: flex; justify-content: center; padding: 34px 22px; background: #f6f3ee; }
 .logo-draw svg { width: 130px; height: 170px; overflow: visible; }
 .logo-draw .ld-ring, .logo-draw .ld-bars { fill: none; stroke: url(#kmetal); stroke-linecap: round; stroke-linejoin: round; filter: url(#kshadow); }
@@ -384,7 +418,6 @@ a.card .card-top { padding-right: 26px; }
   .sec-lead { font-size: calc(16px * var(--t)); }
   .cat-hero { --s: 3; }
   .cat-walk { height: 220px; }
-  .gauge { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .profile { grid-template-columns: 104px 1fr; gap: 18px; }
   .profile img { width: 104px; height: 130px; }
   .cards.grid2 { grid-template-columns: 1fr; }
