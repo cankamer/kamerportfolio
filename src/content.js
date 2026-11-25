@@ -364,6 +364,8 @@ export const SECTIONS = [
           ['/media/mezun-afis.jpg', 'Mezun Yıldızlar · Event poster'],
           ['/media/haneko-ekran.jpg', 'Haneko · "Our screen" visual'],
           ['/media/skeleton-hand.jpg', 'Illustration · skeleton hand with roses and ivy'],
+          ['/media/integral-roses.webp', 'Illustration · an integral sign grown out of roses, drawn in Defter'],
+          ['/media/moon-potato.webp', 'Illustration · a potato on the moon'],
         ],
       },
       { type: 'h', text: 'My logo' },
