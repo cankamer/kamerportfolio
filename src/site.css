@@ -371,7 +371,8 @@ a.card .card-top { padding-right: 26px; }
 .tag { display: flex; flex-direction: column; align-items: center; text-decoration: none; transform-origin: 50% 0; transform: rotate(var(--swing, 0deg)); will-change: transform; backface-visibility: hidden; }
 .tag-thread { width: 1px; height: var(--thread); background: rgba(25, 23, 20, 0.45); }
 .tag-body { position: relative; display: block; filter: drop-shadow(0 12px 12px rgba(40, 32, 20, 0.2)); transition: transform 0.6s var(--ease-out); }
-.tag-body img { display: block; height: auto; }
+/* the tag grows with the text scale so the longest label (Instagram) still fits on the card */
+.tag-body img { display: block; width: calc(111px * var(--t)); height: auto; }
 .tag-body b { position: absolute; left: 0; right: 0; bottom: 16%; text-align: center; font-family: var(--serif); font-weight: 450; font-size: calc(19px * var(--t)); letter-spacing: -0.01em; color: #2b2116; font-variation-settings: "SOFT" 100; transition: color 0.3s; }
 .tag:hover .tag-body { transform: translateY(5px); }
 .tag:hover .tag-body b { color: var(--clay); }
