@@ -235,7 +235,9 @@ a.card .card-top { padding-right: 26px; }
 .gallery { display: flex; gap: 18px; overflow-x: auto; padding: 6px 0 8px; cursor: grab; touch-action: pan-x pan-y; scrollbar-width: none; }
 .gallery::-webkit-scrollbar { display: none; }
 .gallery.dragging { cursor: grabbing; }
-.gallery figure { flex: 0 0 auto; margin: 0; cursor: inherit; }
+/* a narrow picture with a wider caption sits centred in its slot, caption centred under it */
+.gallery figure { flex: 0 0 auto; margin: 0; cursor: inherit; text-align: center; }
+.gallery figure img { margin-inline: auto; }
 .gallery img { -webkit-user-drag: none; user-select: none; display: block; height: 240px; width: auto; border-radius: 3px; background: var(--card-2); box-shadow: 0 12px 24px rgba(40, 32, 20, 0.12); }
 .gallery.tall img { height: 310px; }
 .gallery figcaption { font-size: calc(12px * var(--t)); color: var(--ink-3); margin-top: calc(8px * var(--t)); max-width: calc(200px + 60px * var(--t)); line-height: 1.4; }
